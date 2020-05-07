@@ -1,0 +1,72 @@
+#!/bin/sh
+# gets status of all repos
+
+# TODO export list of existing repos with directories and remotes
+
+dir_name=$1
+depth=$2
+
+function main() {
+	if [[ -z $dir_name ]]; then
+		process_repo $(pwd)
+		exit
+	fi
+
+
+	if [[ -z $depth ]]; then
+		depth=3
+	else
+		depth=$(($depth + 1))
+	fi
+
+	dirs=($(fd .git$ $dir_name -Ha -d $depth -t d --ignore-file ~/.fdgitignore))
+	for dir in "${dirs[@]}"; do
+		process_repo "$(dirname "$dir")"
+	done
+
+	# HOME, if yadm works and config file is there
+	# file=$HOME/.config/shell/functions.sh
+	process_repo $HOME 
+}
+
+function git() {	
+        [[ "$(pwd)" == "$HOME" ]] && yadm "$@" || /usr/bin/git "$@"
+}
+
+function process_repo() {
+	cd $1
+	check_push
+	check_diff
+}
+
+
+
+function curr_dir() {
+	basename $(pwd)
+}
+
+function check_push() {
+	push_commits=$(diff_output | head -1)
+	if [[ $push_commits == *"ahead"* ]]; then
+		echo "$(curr_dir): $push_commits"
+		read -p "would you like to do it now? " answer
+		if [[ $answer == *"y"* ]]; then
+			git push
+		fi
+	fi
+}
+
+function diff_output() {
+	git status -sb
+}
+function check_diff() {
+	changes=$(diff_output | tail -n +2 | wc -l)
+	[[ "$changes" == 0 ]] && return 
+	echo "$(curr_dir): $changes changes"
+	read -p "would you like to deal with this now? " answer
+	[[ $answer == *"y"* ]] && konsole
+}
+
+main
+
+

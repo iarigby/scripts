@@ -1,0 +1,18 @@
+#!/bin/bash
+
+file=~/.current_theme
+current_theme=$(head -n 1 $file) # 0 light 1 dark
+
+[ $current_theme = 0 ] && theme=1 || theme=0
+echo $theme >$file
+
+chtheme_path=$HOME/scripts/change_theme
+if [ "$1" == "test" ]; then
+        source $chtheme_path/$2.sh
+else
+        source $chtheme_path/vscode.sh
+        source $chtheme_path/wallpapers.sh
+        source $chtheme_path/plasma.sh
+        source $chtheme_path/firefox.sh
+#        source $chtheme_path/mailspring.sh
+fi
