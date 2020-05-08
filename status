@@ -5,9 +5,10 @@
 
 dir_name=$1
 depth=$2
-
+IGNORE_FILE=$(dirname "$0")/.fdgitignore
 function main() {
-	if [[ -z $dir_name ]]; then
+	# TODO do I really need this? 
+	if [[ ! -z $dir_name || "$dir_name" == "." ]]; then
 		process_repo $(pwd)
 		exit
 	fi
@@ -19,7 +20,7 @@ function main() {
 		depth=$(($depth + 1))
 	fi
 
-	dirs=($(fd .git$ $dir_name -Ha -d $depth -t d --ignore-file ~/.fdgitignore))
+	dirs=($(fd .git$ $dir_name -Ha -d $depth -t d --ignore-file $IGNORE_FILE))
 	for dir in "${dirs[@]}"; do
 		process_repo "$(dirname "$dir")"
 	done

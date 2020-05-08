@@ -1,0 +1,7 @@
+**/.cache/**
+**/.local/**
+/home/ia/recovered/**
+**/.config
+!/home/ia/.config/yadm
+**/.oh-my-zsh
+**/.vim
