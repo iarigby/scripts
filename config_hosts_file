@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+addresses=(
+"135.181.39.129  htz"
+"217.147.224.204  freeuni"
+)
+
+for address in "${addresses[@]}"
+do
+	sudo sh -c "grep -qxF \"$address\" /etc/hosts || echo \"$address\"  >> /etc/hosts"
+done	
+
